@@ -1,0 +1,4 @@
+User-agent: *
+Disallow: /
+
+Sitemap: https://orgme24.github.io/drmoeen/sitemap.xml
