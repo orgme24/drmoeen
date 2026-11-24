@@ -253,7 +253,7 @@ def footer_html(d):
   </div>
 </footer>'''
 
-DEMO_BANNER = '<div style="background:#1a1613;border-bottom:1px solid var(--line);color:var(--muted);text-align:center;font-size:12.5px;padding:7px 12px">גרסת דמו לצורכי בדיקה בלבד — התוכן נאסף מהאתר הציבורי · אינה מחליפה את האתר הפעיל</div>'
+DEMO_BANNER = '<div class="demobar">גרסת דמו לצורכי בדיקה בלבד — התוכן נאסף מהאתר הציבורי · אינה מחליפה את האתר הפעיל</div>'
 
 def page_shell(title, desc, body, d, cur_slug, extra_head="", noindex=False):
     robots = '<meta name="robots" content="noindex, nofollow">' if noindex else ''
@@ -299,7 +299,7 @@ def breadcrumb_html(trail, d):
     return '<nav class="breadcrumb" aria-label="מיקום">' + '<span>›</span>'.join(parts) + '</nav>'
 
 # ---- contact form component ----
-def contact_form_html():
+def contact_form_html(d=1):
     co = cfg["contact_form"]
     clinics = "".join(f'<option value="{esc(o)}">{esc(o)}</option>' for o in co["clinic_options"])
     subs = "".join(f'<option value="{esc(o)}">{esc(o)}</option>' for o in co["subject_options"])
@@ -319,7 +319,7 @@ def contact_form_html():
   </div>
   <div class="field"><label for="dt">תאריך מבוקש (בקשה בלבד)</label><input id="dt" name="preferred_date" type="date" class="ltr"></div>
   <div class="field"><label for="msg">הודעה</label><textarea id="msg" name="message"></textarea></div>
-  <label class="consent"><input type="checkbox" name="consent" required>אני מסכים/ה ל<a href="../terms-of-use/" style="color:var(--gold-lt)">תנאי השימוש ומדיניות הפרטיות</a> <span class="req">*</span></label>
+  <label class="consent"><input type="checkbox" name="consent" required>אני מסכים/ה ל<a href="{link('terms-of-use',d)}" class="copper">תנאי השימוש ומדיניות הפרטיות</a> <span class="req">*</span></label>
   <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center">שלח/י בקשת תיאום</button>
   <div class="form-status" role="status" aria-live="polite"></div>
 </form>'''
@@ -367,15 +367,6 @@ def write_page(slug, html_str):
 def build_home():
     d = 0
     hp = by_id[HOME_ID]
-    cat_cards = ""
-    order = [("טיפולי-פנים","face"),("טיפולי-גוף","body"),("dental-care","dental")]
-    for cslug, key in order:
-        img = asset(CATIMG[key], d)
-        cat_cards += f'''<a class="cat-card" href="{link(cslug,d)}" aria-label="{esc(CAT_LABEL[cslug])}">
-      <img src="{img}" alt="" loading="lazy"><div class="veil"></div>
-      <div class="label"><h3>{esc(CAT_LABEL[cslug])}</h3>
-        <span class="arrow"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M15 6l-6 6 6 6"/></svg></span>
-      </div></a>'''
     tcards = ""
     for t in testi:
         stars = "★" * int(t.get("displayed_stars",5))
@@ -384,87 +375,96 @@ def build_home():
     bio = ('ד"ר מטאנס מועין, עוסק בתחומי רפואת השיניים והרפואה האסתטית. את ניסיונו המקצועי '
            'רכש ד"ר מטאנס במהלך לימודיו האקדמיים ובמסגרת השתלמויות מקצועיות שעבר בארץ ובעולם.')
     teas = {
-     "face": "הקליניקה של ד\"ר מטאנס עוסקת ברפואה אסתטית ומעניקה מגוון רחב של טיפולי אסתטיקה חדשניים באזור הפנים. מטרת הטיפולים השונים היא להשיג ללקוח מראה רענן יותר וליצור הרמוניה בין מראה הפנים למראה השיניים.",
-     "dental": "רפואת השיניים היא תחום עיסוק מרכזי בקליניקת DMC של ד\"ר מטאנס מועין. המרפאה מבצעת מגוון רחב של טיפולי שיניים מתקדמים למבוגרים ולילדים, בסביבה סטרילית והיגיינית ובשימוש בציוד חדיש ומתקדם.",
-     "body": "מרפאת DMC של ד\"ר מטאנס מועין מציעה מגוון טיפולי גוף אסתטיים בטכנולוגיות מתקדמות. מגוון הטיפולים הרחב, בשילוב הידע המקצועי, מאפשר לנו להציע ללקוחותינו את פתרונות היופי והאסתטיקה המובילים.",
+     "face": "הקליניקה של ד\"ר מטאנס עוסקת ברפואה אסתטית ומעניקה מגוון רחב של טיפולי אסתטיקה חדשניים באזור הפנים. מטרת הטיפולים היא להשיג מראה רענן יותר וליצור הרמוניה בין מראה הפנים למראה השיניים.",
+     "dental": "רפואת השיניים היא תחום עיסוק מרכזי בקליניקת DMC. המרפאה מבצעת מגוון רחב של טיפולי שיניים מתקדמים למבוגרים ולילדים, בסביבה סטרילית ובשימוש בציוד חדיש ומתקדם.",
+     "body": "מרפאת DMC מציעה מגוון טיפולי גוף אסתטיים בטכנולוגיות מתקדמות. מגוון הטיפולים הרחב, בשילוב הידע המקצועי, מאפשר להציע את פתרונות היופי והאסתטיקה המובילים.",
     }
+    strip_order = [("01","טיפולי-פנים","face"),("02","טיפולי-גוף","body"),("03","dental-care","dental")]
+    strip = ""
+    for num, cslug, key in strip_order:
+        strip += f'''<a class="strip-item" href="{link(cslug,d)}">
+      <span class="num">{num}</span><span class="slash">/</span>
+      <span class="name">{esc(CAT_LABEL[cslug])}</span>
+      <span class="go"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M15 6l-6 6 6 6"/></svg></span></a>'''
+    areas = ""
+    for num, cslug, key in strip_order:
+        areas += f'''<div class="area-row">
+      <div class="anum">{num}</div>
+      <div class="atext"><h3>{esc(CAT_LABEL[cslug])}</h3><p>{esc(teas[key])}</p>
+        <a class="btn-ghost" href="{link(cslug,d)}">לכל הטיפולים בתחום</a></div>
+      <a class="aimg" href="{link(cslug,d)}" aria-hidden="true" tabindex="-1"><img src="{asset(CATIMG[key],d)}" alt="" loading="lazy"></a>
+    </div>'''
     body = f'''
 <section class="hero" aria-label="ראשי">
-  <div class="wrap">
-    <div class="hero-grid">
-      <div class="player" aria-label="סרטון היכרות עם המרפאה">
-        <video poster="{asset(POSTER,d)}" preload="metadata" playsinline>
-          <source src="{asset(VIDEO,d)}" type="video/mp4">
-          הדפדפן שלך אינו תומך בנגן הווידאו.
-        </video>
-        <div class="poster-ui" role="button" tabindex="0" aria-label="הפעלת סרטון המרפאה">
-          <span class="play-ring"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></span>
-          <span class="caption">הכירו את המרפאה</span>
-        </div>
-      </div>
-      <div class="hero-text">
-        <div class="eyebrow"><b>DR.MOEEN</b> <span class="green">AESTHETICS</span></div>
-        <h1>העתיד של היופי<br>מתחיל בך</h1>
-        <div class="subline">אסתטיקה <span class="dot">•</span> רפואת שיניים <span class="dot">•</span> טכנולוגיה</div>
-        <div class="hero-cta">
-          <a class="btn btn-primary" href="{link(CONTACT,d)}">לתיאום פגישת ייעוץ</a>
-          <a class="btn btn-ghost" href="#categories">גלו את הטיפולים
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M15 6l-6 6 6 6"/></svg></a>
-        </div>
+  <div class="hero-media">
+    <video class="hero-video" poster="{asset(POSTER,d)}" preload="metadata" playsinline>
+      <source src="{asset(VIDEO,d)}" type="video/mp4">
+      הדפדפן שלך אינו תומך בנגן הווידאו.
+    </video>
+    <div class="hero-grad" aria-hidden="true"></div>
+    <div class="hero-copy">
+      <div class="hero-eyebrow latin">DR.MOEEN <span class="brand">AESTHETICS</span></div>
+      <h1 class="t1">דיוק שרואים.</h1>
+      <h1 class="t2">יחס שמרגישים.</h1>
+      <p class="hero-sub">רפואת שיניים ואסתטיקה בגישה אישית</p>
+      <div class="hero-actions">
+        <button type="button" class="film-btn" aria-label="הפעלת הסרט של המרפאה">
+          <span class="ring"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></span>
+          <span class="lbl">הסרט של המרפאה</span>
+        </button>
+        <a class="btn btn-outline" href="{link(CONTACT,d)}">לתיאום פגישת ייעוץ</a>
       </div>
     </div>
-    <div class="wave" aria-hidden="true"><svg viewBox="0 0 1200 60" preserveAspectRatio="none"><path d="M0 40 Q 300 5 600 32 T 1200 24" fill="none" stroke="currentColor" stroke-width="1.4"/></svg></div>
-    <div class="locations">קריות <span style="color:var(--gold)">•</span> מעיליא</div>
-    <div id="categories" class="cats">{cat_cards}</div>
   </div>
 </section>
 
-<section aria-label="על הרופא">
+<section class="strip" aria-label="תחומי הטיפול" style="padding:0">
+  <div class="strip-inner">{strip}</div>
+</section>
+
+<section class="section-light" aria-label="היכרות עם הרופא">
   <div class="wrap">
-    <div class="doctor">
+    <div class="intro-grid">
       <div class="portrait"><img src="{asset(PORTRAIT,d)}" alt="ד&quot;ר מטאנס מועין" loading="lazy"></div>
       <div>
-        <div class="section-eyebrow" style="text-align:right">על הרופא</div>
-        <h2>ד"ר מטאנס מועין</h2>
-        <div class="eng">Dr. Moeen Matanis</div>
-        <p style="color:var(--text2)">{esc(bio)}</p>
-        <p style="color:var(--text2)">{esc(teas["face"])}</p>
-        <div class="hero-cta" style="margin-top:22px"><a class="btn btn-primary" href="{link(ABOUT,d)}">עוד על ד"ר מטאנס</a>
-        <a class="btn btn-ghost" href="{link(CONTACT,d)}">למידע על הקליניקות</a></div>
+        <div class="eyebrow-s">האדם מאחורי הדיוק</div>
+        <h2>נעים להכיר.</h2>
+        <div class="eng">ד"ר מטאנס מועין · Dr. Moeen Matanis</div>
+        <p>{esc(bio)}</p>
+        <div style="margin-top:22px;display:flex;gap:18px;flex-wrap:wrap">
+          <a class="btn btn-outline" href="{link(ABOUT,d)}">עוד על ד"ר מטאנס</a>
+          <a class="btn-ghost" href="{link(CONTACT,d)}">למידע על הקליניקות</a>
+        </div>
       </div>
     </div>
   </div>
 </section>
 
-<section aria-label="תחומי טיפול" style="background:rgba(185,157,117,.04);border-block:1px solid var(--line)">
-  <div class="wrap">
+<section aria-label="תחומי טיפול">
+  <div class="wrap narrow">
     <div class="section-eyebrow">תחומי הטיפול</div>
-    <div class="section-title"><h2>שלושה עולמות של אסתטיקה</h2></div>
-    <div class="tiles" style="grid-template-columns:repeat(3,1fr)">
-      <div class="tile"><div class="ph"><img src="{asset(CATIMG["face"],d)}" alt="" loading="lazy"></div><div class="tt" style="flex-direction:column;align-items:stretch"><h3 style="margin-bottom:8px"><a href="{link("טיפולי-פנים",d)}">טיפולי פנים</a></h3><p style="color:var(--text2);font-size:14.5px;margin:0">{esc(teas["face"])}</p></div></div>
-      <div class="tile"><div class="ph"><img src="{asset(CATIMG["body"],d)}" alt="" loading="lazy"></div><div class="tt" style="flex-direction:column;align-items:stretch"><h3 style="margin-bottom:8px"><a href="{link("טיפולי-גוף",d)}">טיפולי גוף</a></h3><p style="color:var(--text2);font-size:14.5px;margin:0">{esc(teas["body"])}</p></div></div>
-      <div class="tile"><div class="ph"><img src="{asset(CATIMG["dental"],d)}" alt="" loading="lazy"></div><div class="tt" style="flex-direction:column;align-items:stretch"><h3 style="margin-bottom:8px"><a href="{link("dental-care",d)}">רפואת שיניים</a></h3><p style="color:var(--text2);font-size:14.5px;margin:0">{esc(teas["dental"])}</p></div></div>
-    </div>
+    <div class="section-title"><h2>שלושה עולמות, גישה אחת</h2></div>
+    <div class="areas" style="margin-top:34px">{areas}</div>
   </div>
 </section>
 
-<section aria-label="חוות דעת">
+<section class="section-light" aria-label="חוות דעת">
   <div class="wrap">
     <div class="section-eyebrow">לקוחות ממליצים</div>
     <div class="section-title"><h2>חוות דעת</h2></div>
     <p class="lead">{len(testi)} חוות דעת שנאספו מעמוד הבית של האתר.</p>
     <div class="testi-grid">{tcards}</div>
-    <div style="text-align:center;margin-top:30px"><a class="btn btn-ghost" href="{link(REVIEWS,d)}">לכל חוות הדעת</a></div>
+    <div style="text-align:center;margin-top:34px"><a class="btn-ghost" href="{link(REVIEWS,d)}">לכל חוות הדעת</a></div>
   </div>
 </section>
 
-<section id="booking" aria-label="תיאום פגישה" style="background:rgba(185,157,117,.04);border-block:1px solid var(--line)">
+<section id="booking" aria-label="תיאום פגישה">
   <div class="wrap">
     <div class="section-eyebrow">נשמח לעמוד לרשותכם</div>
     <div class="section-title"><h2>תיאום פגישת ייעוץ</h2></div>
     <p class="lead">חייגו 072-394-5160 או השאירו פרטים ונחזור אליכם.</p>
-    <div class="contact-grid" style="margin-top:30px">
-      {contact_form_html()}
+    <div class="contact-grid" style="margin-top:34px">
+      {contact_form_html(d)}
       <div>{clinics_html(d)}</div>
     </div>
   </div>
@@ -554,7 +554,7 @@ def build_contact_page():
   <p class="lead" style="margin-bottom:30px">נשמח לעמוד לרשותכם. חייגו, נווטו אל אחת הקליניקות, או השאירו פרטים.</p>
   {clinics_html(d)}
   <div class="contact-grid" style="margin-top:36px">
-    {contact_form_html()}
+    {contact_form_html(d)}
     <div>
       <div class="related"><h4>פנייה מהירה</h4>
         <p style="color:var(--text2)">ניתן לפנות גם בוואטסאפ או בטלפון בשעות הפעילות.</p>
