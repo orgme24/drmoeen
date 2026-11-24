@@ -18,31 +18,32 @@
     });
   }
 
-  /* -------- Hero video player -------- */
-  var player = document.querySelector(".player");
-  if (player) {
-    var video = player.querySelector("video");
-    var posterUi = player.querySelector(".poster-ui");
+  /* -------- Hero clinic film -------- */
+  var hero = document.querySelector(".hero");
+  if (hero) {
+    var video = hero.querySelector(".hero-video");
+    var filmBtn = hero.querySelector(".film-btn");
     var start = function () {
       if (!video) return;
-      player.classList.add("playing");
+      hero.classList.add("playing");
+      video.classList.add("ctrl");
       video.setAttribute("controls", "controls");
       var p = video.play();
       if (p && p.catch) p.catch(function () {});
+      video.focus && video.focus();
     };
-    if (posterUi) {
-      posterUi.addEventListener("click", start);
-      posterUi.addEventListener("keydown", function (e) {
-        if (e.key === "Enter" || e.key === " ") { e.preventDefault(); start(); }
-      });
-    }
+    if (filmBtn) filmBtn.addEventListener("click", start);
     if (video) {
       video.addEventListener("pause", function () {
-        if (video.currentTime === 0) player.classList.remove("playing");
+        if (video.currentTime === 0) {
+          hero.classList.remove("playing");
+          video.classList.remove("ctrl");
+          video.removeAttribute("controls");
+        }
       });
       video.addEventListener("error", function () {
-        var cap = player.querySelector(".caption");
-        if (cap) cap.textContent = "לא ניתן לטעון את הסרטון כעת";
+        var lbl = filmBtn && filmBtn.querySelector(".lbl");
+        if (lbl) lbl.textContent = "לא ניתן לטעון את הסרטון כעת";
       });
     }
   }

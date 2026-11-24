@@ -340,11 +340,12 @@ def clinics_html(d):
 # =========================================================
 #  BUILD
 # =========================================================
+KEEP = {".git", "assets", "README.md", "build.py", "COVERAGE.md",
+        ".gitignore", ".nojekyll"}
 if os.path.isdir(OUT):
     for name in os.listdir(OUT):
-        if name in (".git",): continue
+        if name in KEEP: continue
         p = os.path.join(OUT, name)
-        if name == "assets": continue  # keep css/js we authored; media copied below
         shutil.rmtree(p) if os.path.isdir(p) else os.remove(p)
 
 os.makedirs(os.path.join(OUT, "assets"), exist_ok=True)
